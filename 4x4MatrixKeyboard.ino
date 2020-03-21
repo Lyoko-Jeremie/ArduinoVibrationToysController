@@ -8,17 +8,42 @@
 
 // follow code port from https://github.com/Lyoko-Jeremie/52/blob/master/main.c
 
-const int row0 = 5;
-const int row1 = 4;
-const int row2 = 3;
-const int row3 = 2;
+int row0 = 5;
+int row1 = 4;
+int row2 = 3;
+int row3 = 2;
 
-const int col0 = 6;
-const int col1 = 7;
-const int col2 = 8;
-const int col3 = 9;
+int col0 = 6;
+int col1 = 7;
+int col2 = 8;
+int col3 = 9;
+
+uint8_t isInited = false;
+
+void SetPin(
+        int _row0,
+        int _row1,
+        int _row2,
+        int _row3,
+        int _col0,
+        int _col1,
+        int _col2,
+        int _col3
+) {
+    if (!isInited) {
+        row0 = _row0;
+        row1 = _row1;
+        row2 = _row2;
+        row3 = _row3;
+        col0 = _col0;
+        col1 = _col1;
+        col2 = _col2;
+        col3 = _col3;
+    }
+}
 
 void initPortState() {
+    isInited = true;
     pinMode(row0, OUTPUT);
     pinMode(row1, OUTPUT);
     pinMode(row2, OUTPUT);
@@ -117,9 +142,9 @@ void CallKeyCallBackFunction() {
     for (i = 0; i != 16; ++i) {
         // 如果矩阵键盘此处是一个已确认的上升沿
         if (AKstate[i / 4][i % 4] & 0x4u) {
-            uint8_t edge = (AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u;
+            uint8_t stableState = (AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u;
             if (CBKeyList[i]) {
-                (CBKeyList[i])(edge, i);
+                (CBKeyList[i])(stableState, i);
             }
         }
     }
@@ -129,4 +154,8 @@ void CallKeyCallBackFunction() {
 void ScanKeyAndCallKeyCallBackFunction() {
     ArrayKeyScan();
     CallKeyCallBackFunction();
+}
+
+uint8_t GetKeyState(uint8_t i) {
+    return AKstate[i / 4][i % 4] & 0x2u;
 }
