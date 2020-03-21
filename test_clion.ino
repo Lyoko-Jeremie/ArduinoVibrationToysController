@@ -39,8 +39,7 @@ void setup() {
 }
 
 void sleep(unsigned long ms) {
-    ArrayKeyScan();
-    CallKeyCallBackFunction();
+    ScanKeyAndCallKeyCallBackFunction();
     delay(ms);
 }
 
@@ -52,8 +51,7 @@ void mode3();
 
 void loop() {
 //    key_test(5, 20);
-    ArrayKeyScan();
-    CallKeyCallBackFunction();
+    ScanKeyAndCallKeyCallBackFunction();
 
 
 

@@ -7,8 +7,7 @@
 #define TESTCLION_4X4MATRIXKEYBOARD_H
 
 void initPortState();
-void ArrayKeyScan();
-void CallKeyCallBackFunction();
+void ScanKeyAndCallKeyCallBackFunction();
 
 typedef void (CallBack_Key)(uint8_t edge, uint8_t keynum);
 

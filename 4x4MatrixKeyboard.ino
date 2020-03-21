@@ -29,8 +29,9 @@ void initPortState() {
     pinMode(col3, INPUT_PULLUP);
 }
 
-// 0x2 是否确实按下
-// 0x1 是否程检测到过一次与是否按下状态不符
+// 0x1 刚检测到一次疑似状态变更（防抖）
+// 0x2 已确认的当前状态
+// 0x4 刚发生了一次确认的状态变更
 uint8_t AKstate[4][4] = {
         {0, 0, 0, 0},
         {0, 0, 0, 0},
@@ -69,56 +70,31 @@ void ArrayKeyScan() {
                 // 检测到接通
                 if (AKstate[i][j] & 0x2u) {
                     // 且本就为按下状态
-                    AKstate[i][j] &= 0xFEu;  // 清除flag0x1
+                    AKstate[i][j] = 0x2u;  // 清除flag0x1 flag0x4 标记flag0x2
                 } else {
-                    Serial.print("1!(AKstate[i][j] & 0x2u) -------\n");
                     // 且本不为按下状态
                     if (AKstate[i][j] & 0x1u) {
-                        Serial.print("1 AKstate[i][j] & 0x1u \n");
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\t");
                         // 上次已经标记
-                        AKstate[i][j] ^= 0x3u; // 与0x1|0x2异或 去除0x1 标记0x2
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\n");
+                        AKstate[i][j] = 0x2u | 0x4u;  // 标记flag0x4 flag0x2 清除flag0x1
                     } else {
-                        Serial.print("1 !(AKstate[i][j] & 0x1u) \n");
                         // 标记flag0x1
-                        AKstate[i][j] |= 0x1u;
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\n");
+                        AKstate[i][j] = 0x1u;
                     }
                 }
             } else {
                 // 检测到未接通
                 if (!(AKstate[i][j] & 0x2u)) {
-//                    Serial.print("2!(AKstate[i][j] & 0x2u) \n");
-                    // 且本就为未按下状态
-                    AKstate[i][j] &= 0xFEu;  // 清除flag0x1
-                } else {
-                    Serial.print("2!(AKstate[i][j] & 0x2u) -------\n");
-                    // 且本为按下状态
                     if (AKstate[i][j] & 0x1u) {
-                        Serial.print("2 AKstate[i][j] & 0x1u \t");
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\t");
                         // 上次已经标记
-                        AKstate[i][j] &= 0xFCu;  // 清除 0x1|0x2
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\n");
+                        AKstate[i][j] = 0x4u;  // 清除flag0x1 flag0x2 标记flag0x4
                     } else {
-                        Serial.print("2 !(AKstate[i][j] & 0x1u) \n");
-                        // 标记flag0x1
-                        AKstate[i][j] |= 0x1u;   // 标记
-                        Serial.print("AKstate[i][j] =");
-                        Serial.print(AKstate[i][j]);
-                        Serial.print("\n");
+                        // 且本就为未按下状态
+                        AKstate[i][j] = 0x00u;  // 清除flag0x1 flag0x2 flag0x4
                     }
+                } else {
+                    // 且本为按下状态
+                    // 标记flag0x1
+                    AKstate[i][j] = 0x1u;   // 标记flag0x1
                 }
             }
         }
@@ -136,29 +112,21 @@ void setCallBackFunction(uint8_t i, CallBack_Key func) {
 
 // 调用按键回调函数
 void CallKeyCallBackFunction() {
-    uint8_t i, o2, o3;
+    uint8_t i;
     // 矩阵键盘
     for (i = 0; i != 16; ++i) {
-        // 如果矩阵键盘现态与上态不同
-        o2 = (uint8_t)((AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u);
-        o3 = (uint8_t)((AKstate[i / 4][i % 4] & 0x3u) ? 1u : 0u);
-        if (o2 != o3) {
-            Serial.print("o2 = ");
-            Serial.print(o2);
-            Serial.print("\t o3 = ");
-            Serial.print(o3);
-            Serial.print("\t AKstate = ");
-            Serial.print(AKstate[i / 4][i % 4]);
-            Serial.print("\n");
+        // 如果矩阵键盘此处是一个已确认的上升沿
+        if (AKstate[i / 4][i % 4] & 0x4u) {
+            uint8_t edge = (AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u;
             if (CBKeyList[i]) {
-//                (CBKeyList[i])(edge, i);
-                (CBKeyList[i])(AKstate[i / 4][i % 4], i);
-            }
-            AKstate[i / 4][i % 4] ^= 0x3u;   // 翻转上态使其与现态相等
-            uint8_t edge = (AKstate[i / 4][i % 4] & 0x3u) ? 1u : 0u;
-            if (CBKeyList[i]) {
-//                (CBKeyList[i])(edge, i);
+                (CBKeyList[i])(edge, i);
             }
         }
     }
+}
+
+
+void ScanKeyAndCallKeyCallBackFunction() {
+    ArrayKeyScan();
+    CallKeyCallBackFunction();
 }
