@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "4x4MatrixKeyboard.h"
+#include "4x4MatrixKeyboard/4x4MatrixKeyboard.h"
 
 // test PWM
 
