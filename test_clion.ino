@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "4x4MatrixKeyboard/4x4MatrixKeyboard.h"
+#include "VibrationRhythmController/VibrationRhythmController.h"
 
 // test PWM
 
@@ -12,6 +13,9 @@ Servo servos[3];
 void key_test(uint8_t edge, uint8_t keynum);
 
 void setup() {
+
+    testCheckRhythmTable();
+
 
     initPortState();
     setCallBackFunction(0, key_test);

@@ -21,6 +21,7 @@ set(${PROJECT_NAME}_SKETCH test_clion.ino)
 #set(ENABLE_MAXIMIZE_MODE ON)   # not work
 #add_compile_definitions(ENABLE_MAXIMIZE_MODE=1)
 add_subdirectory(4x4MatrixKeyboard)
+add_subdirectory(VibrationRhythmController)
 
 ### Additional settings to add non-standard or your own Arduino libraries.
 # For this example (libs will contain additional arduino libraries)
