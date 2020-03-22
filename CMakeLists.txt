@@ -18,6 +18,8 @@ project(${PROJECT_NAME})
 set(${PROJECT_NAME}_SKETCH test_clion.ino)
 
 ### Add project directories into the build
+#set(ENABLE_MAXIMIZE_MODE ON)   # not work
+#add_compile_definitions(ENABLE_MAXIMIZE_MODE=1)
 add_subdirectory(4x4MatrixKeyboard)
 
 ### Additional settings to add non-standard or your own Arduino libraries.

@@ -8,6 +8,10 @@
 
 // follow code port from https://github.com/Lyoko-Jeremie/52/blob/master/main.c
 
+uint8_t isInited = false;
+
+
+#ifdef USE_SET_PIN
 int row0 = 5;
 int row1 = 4;
 int row2 = 3;
@@ -17,8 +21,6 @@ int col0 = 6;
 int col1 = 7;
 int col2 = 8;
 int col3 = 9;
-
-uint8_t isInited = false;
 
 void SetPin(
         int _row0,
@@ -41,17 +43,68 @@ void SetPin(
         col3 = _col3;
     }
 }
+#else   // USE_SET_PIN
+const int row0 = PREDEFINE_PIN_ROW_0;
+const int row1 = PREDEFINE_PIN_ROW_1;
+const int row2 = PREDEFINE_PIN_ROW_2;
+const int row3 = PREDEFINE_PIN_ROW_3;
 
+const int col0 = PREDEFINE_PIN_COL_0;
+const int col1 = PREDEFINE_PIN_COL_1;
+const int col2 = PREDEFINE_PIN_COL_2;
+const int col3 = PREDEFINE_PIN_COL_3;
+
+//const int row0 = 5;
+//const int row1 = 4;
+//const int row2 = 3;
+//const int row3 = 2;
+//
+//const int col0 = 6;
+//const int col1 = 7;
+//const int col2 = 8;
+//const int col3 = 9;
+#endif  // USE_SET_PIN  USE_PREDEFINE_SET_PIN
+
+#ifdef USE_MAX_VALID_ROW_COL
+uint8_t MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
+uint8_t MaxValidCol = D_4X4MATRIXKEYBOARD_MAX_COLS;
+
+void setMaxValidRowCol(uint8_t row, uint8_t col) {
+    if (!isInited) {
+        if (row > D_4X4MATRIXKEYBOARD_MAX_ROWS) {
+            MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
+        } else if (row < 0) {
+            MaxValidRow = 0;
+        } else {
+            MaxValidRow = row;
+        }
+        if (col > D_4X4MATRIXKEYBOARD_MAX_COLS) {
+            MaxValidCol = D_4X4MATRIXKEYBOARD_MAX_COLS;
+        } else if (col < 0) {
+            MaxValidCol = 0;
+        } else {
+            MaxValidCol = col;
+        }
+    }
+}
+#else   // USE_MAX_VALID_ROW_COL
+const uint8_t MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
+const uint8_t MaxValidCol = D_4X4MATRIXKEYBOARD_MAX_COLS;
+#endif  // USE_MAX_VALID_ROW_COL
+
+/**
+ * must call before ScanKeyAndCallKeyCallBackFunction()
+ */
 void initPortState() {
     isInited = true;
-    pinMode(row0, OUTPUT);
-    pinMode(row1, OUTPUT);
-    pinMode(row2, OUTPUT);
-    pinMode(row3, OUTPUT);
-    pinMode(col0, INPUT_PULLUP);
-    pinMode(col1, INPUT_PULLUP);
-    pinMode(col2, INPUT_PULLUP);
-    pinMode(col3, INPUT_PULLUP);
+    if (MaxValidRow > 0) pinMode(row0, OUTPUT);
+    if (MaxValidRow > 1) pinMode(row1, OUTPUT);
+    if (MaxValidRow > 2) pinMode(row2, OUTPUT);
+    if (MaxValidRow > 3) pinMode(row3, OUTPUT);
+    if (MaxValidCol > 0) pinMode(col0, INPUT_PULLUP);
+    if (MaxValidCol > 1) pinMode(col1, INPUT_PULLUP);
+    if (MaxValidCol > 2) pinMode(col2, INPUT_PULLUP);
+    if (MaxValidCol > 3) pinMode(col3, INPUT_PULLUP);
 }
 
 // 0x1 刚检测到一次疑似状态变更（防抖）
@@ -80,17 +133,16 @@ uint8_t GetColState(uint8_t n) {
 }
 
 void ArrayKeyScan() {
-    char i, j;
-    for (i = 0; i != 4; ++i) {
-        digitalWrite(row0, HIGH);
-        digitalWrite(row1, HIGH);
-        digitalWrite(row2, HIGH);
-        digitalWrite(row3, HIGH);
+    for (uint8_t i = 0; i < MaxValidRow; ++i) {
+        if (MaxValidRow > 0) digitalWrite(row0, HIGH);
+        if (MaxValidRow > 1) digitalWrite(row1, HIGH);
+        if (MaxValidRow > 2) digitalWrite(row2, HIGH);
+        if (MaxValidRow > 3) digitalWrite(row3, HIGH);
         if (0 == i) digitalWrite(row0, LOW);
         if (1 == i) digitalWrite(row1, LOW);
         if (2 == i) digitalWrite(row2, LOW);
         if (3 == i) digitalWrite(row3, LOW);
-        for (j = 0; j != 4; ++j) {
+        for (uint8_t j = 0; j < MaxValidCol; ++j) {
             if (!GetColState(j)) {
                 // 检测到接通
                 if (AKstate[i][j] & 0x2u) {
