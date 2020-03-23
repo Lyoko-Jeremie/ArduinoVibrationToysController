@@ -8,8 +8,8 @@ set(${PROJECT_NAME}_BOARD uno)
 project(${PROJECT_NAME})
 
 # Define additional source and header files or default arduino sketch files
-#set(${PROJECT_NAME}_SRCS 4x4MatrixKeyboard/4x4MatrixKeyboard.cpp)
-#set(${PROJECT_NAME}_HDRS pitches.h 4x4MatrixKeyboard/4x4MatrixKeyboard.h)
+# set(${PROJECT_NAME}_SRCS)
+# set(${PROJECT_NAME}_HDRS)
 
 ### Additional static libraries to include in the target.
 # set(${PROJECT_NAME}_LIBS)
@@ -37,7 +37,7 @@ set(Servo True)
 
 #### Additional settings for programmer. From programmers.txt
 set(${PROJECT_NAME}_PROGRAMMER avrispmkii)
-set(${PROJECT_NAME}_PORT COM3)
+set(${PROJECT_NAME}_PORT COM4)
 # set(uno.upload.speed 9600)
 
 ## Verbose build process
