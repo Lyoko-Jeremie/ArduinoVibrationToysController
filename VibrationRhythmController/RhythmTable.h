@@ -13,19 +13,30 @@ extern const RhythmDataType total_length_offset;
 extern const RhythmDataType rhythm_begin_offset;
 extern const RhythmDataType rhythm_type_size;
 
-RhythmDataType *getRhythmFromTable(uint16_t i);
+RhythmDataType *_getRhythmFromTable(uint16_t i);
 
-//#define getRhythmFromTable(i) \
+int16_t _getTotalLengthFromRhythm(RhythmDataType *r);
+
+RhythmDataType _getRhythmOffsetFromRhythm(RhythmDataType *r, uint16_t i);
+
+RhythmDataType _getIntervalCountFromRhythm(RhythmDataType *r, uint16_t i);
+
+
+#define getRhythmFromTable(i) \
+_getRhythmFromTable(i)
 //(RhythmDataType *) pgm_read_ptr(RhythmTable + i)
 
 #define getTotalLengthFromRhythm(r) \
-(int16_t) pgm_read_word(r + total_length_offset)
+_getTotalLengthFromRhythm(r)
+//(int16_t) pgm_read_word(r + total_length_offset)
 
 #define getRhythmOffsetFromRhythm(r, i) \
-(RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2) * rhythm_type_size)
+_getRhythmOffsetFromRhythm(r, i)
+//(RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2) * rhythm_type_size)
 
 #define getIntervalCountFromRhythm(r, i) \
-(RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2 + 1) * rhythm_type_size)
+_getIntervalCountFromRhythm(r, i)
+//(RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2 + 1) * rhythm_type_size)
 
 
 #endif //H_RHYTHMTABLE_H
