@@ -5,6 +5,7 @@
 #ifndef H_VIBRATIONRHYTHMCONTROLLER_H
 #define H_VIBRATIONRHYTHMCONTROLLER_H
 
+#include "RhythmTable.h"
 
 void testCheckRhythmTable();
 

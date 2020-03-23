@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#include "RhythmTable.h"
+#include "RhythmTable_intenal.h"
 
 // the data example
 //const PROGMEM int16_t Rhythm[2 + 8 * 2] = {
