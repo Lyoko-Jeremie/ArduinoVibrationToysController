@@ -9,6 +9,7 @@
 
 
 void testCheckRhythmTable() {
+    Serial.print("testCheckRhythmTable\n");
     for (int i = 0; i < RhythmTableSize; ++i) {
         Serial.print("========================\n");
         Serial.print("Rhythm (");
@@ -28,10 +29,10 @@ void testCheckRhythmTable() {
             RhythmDataType offset = getRhythmOffsetFromRhythm(p, j);
 //            RhythmDataType interval_count = pgm_read_word(p + rhythm_begin_offset + (j * 2 + 1) * rhythm_type_size);
             RhythmDataType interval_count = getIntervalCountFromRhythm(p, j);
-            Serial.print(",\n");
-            Serial.print(len);
+            Serial.print("\n");
+            Serial.print(offset);
             Serial.print(", ");
-            Serial.print(len);
+            Serial.print(interval_count);
             Serial.print(",");
         }
         Serial.print("}\n");

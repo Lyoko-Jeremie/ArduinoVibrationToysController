@@ -30,7 +30,7 @@ const int16_t rhythm_type_size = sizeof(RhythmDataType);
 // by byte
 const int16_t total_length_offset = 0 * rhythm_type_size;
 // by byte
-const int16_t rhythm_begin_offset = rhythm_head_length * rhythm_type_size;
+const int16_t rhythm_begin_offset = rhythm_head_length; // dont need to ```rhythm_head_length * rhythm_type_size```
 
 #define MAKE_Rhythm(name, total_length, args...)                                \
 const PROGMEM RhythmDataType name[rhythm_head_length + total_length * 2] = {    \
@@ -67,17 +67,9 @@ MAKE_Rhythm(R3, 8,
             -500, 5,
 );
 
-const RhythmDataType RhythmTableSize = 11;
-const PROGMEM RhythmDataType *const RhythmTable[RhythmTableSize] = {
+const RhythmDataType RhythmTableSize = 3;
+const PROGMEM RhythmDataType *const RhythmTable[RhythmTableSize] PROGMEM = {
         R1,
-        R1,
-        R1,
-        R1,
-        R2,
-        R2,
-        R2,
-        R2,
-        R2,
         R2,
         R3,
 };
@@ -87,13 +79,25 @@ RhythmDataType *_getRhythmFromTable(uint16_t i) {
 }
 
 int16_t _getTotalLengthFromRhythm(RhythmDataType *r) {
+//    Serial.print("_getTotalLengthFromRhythm = ");
+//    for (int i = 0; i < 32; ++i) {
+//        Serial.print((RhythmDataType)pgm_read_word(r + i));
+//        Serial.print(" ");
+//    }
+//    Serial.print("\n");
     return (int16_t) pgm_read_word(r + total_length_offset);
 }
 
 RhythmDataType _getRhythmOffsetFromRhythm(RhythmDataType *r, uint16_t i) {
-    return (RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2) * rhythm_type_size);
+//    Serial.print("_getRhythmOffsetFromRhythm = ");
+//    Serial.print((RhythmDataType)pgm_read_word(r + rhythm_begin_offset + (i * 2)));
+//    Serial.print("\n");
+    return (RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2));
 }
 
 RhythmDataType _getIntervalCountFromRhythm(RhythmDataType *r, uint16_t i) {
-    return (RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2 + 1) * rhythm_type_size);
+//    Serial.print("_getIntervalCountFromRhythm = ");
+//    Serial.print((RhythmDataType)pgm_read_word(r + rhythm_begin_offset + (i * 2 + 1)));
+//    Serial.print("\n");
+    return (RhythmDataType) pgm_read_word(r + rhythm_begin_offset + (i * 2 + 1));
 }

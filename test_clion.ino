@@ -14,7 +14,9 @@ void key_test(uint8_t edge, uint8_t keynum);
 
 void setup() {
 
+    Serial.begin(9600);
     testCheckRhythmTable();
+    return;
 
 
     initPortState();
@@ -54,6 +56,10 @@ void mode2();
 void mode3();
 
 void loop() {
+
+//    delay(5000);
+    return;
+
 //    key_test(5, 20);
     ScanKeyAndCallKeyCallBackFunction();
 
