@@ -261,4 +261,32 @@ RhythmDataType RhythmPlayer::getNextNote() {
     return this->rhythmNoteOffset;
 }
 
+uint16_t RhythmPlayer::getNowRhythmIndex() {
+    return this->rhythmIndex;
+}
+
+void RhythmPlayer::forceNextRhythm() {
+    uint16_t newI = this->rhythmIndex + 1;
+    if (newI >= RhythmTableSize) {
+        newI = 0;
+    }
+    this->init(newI, this->playMode, this->playDirection);
+}
+
+void RhythmPlayer::forceLastRhythm() {
+    uint16_t newI = this->rhythmIndex - 1;
+    if (0 == this->rhythmIndex) {
+        newI = this->rhythmIndex - 1;
+    }
+    this->init(newI, this->playMode, this->playDirection);
+}
+
+void RhythmPlayer::setModeOnNowRhythm(uint16_t playMode) {
+    this->playMode = playMode;
+}
+
+void RhythmPlayer::setDirectionOnNowRhythm(uint16_t playDirection) {
+    this->playDirection = playDirection;
+}
+
 

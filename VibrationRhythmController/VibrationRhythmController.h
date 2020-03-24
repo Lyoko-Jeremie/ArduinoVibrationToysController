@@ -74,12 +74,23 @@ public:
 
 protected:
     void loadNextSummary(int16_t nextSummaryIndex);
+
     void loadNextRhythm();
 
     int16_t calcNextSummaryIndex(boolean initMode = false);
 
 public:
     RhythmDataType getNextNote();
+
+    uint16_t getNowRhythmIndex();
+
+    void forceNextRhythm();
+
+    void forceLastRhythm();
+
+    void setModeOnNowRhythm(uint16_t playMode);
+
+    void setDirectionOnNowRhythm(uint16_t playDirection);
 
 };
 
