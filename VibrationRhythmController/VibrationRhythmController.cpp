@@ -60,9 +60,9 @@ void RhythmPlayer::loadRhythm(uint16_t rhythmIndex) {
     if (RhythmTableSize <= rhythmIndex) {
         rhythmIndex = 0;
     }
-//    Serial.print("jump to rhythm:");
-//    Serial.print(this->rhythmIndex);
-//    Serial.print("\n");
+    Serial.print("jump to rhythm:");
+    Serial.print(rhythmIndex);
+    Serial.print("\n");
     this->rhythmIndex = rhythmIndex;
     this->rhythmP = getRhythmFromTable(rhythmIndex);
     this->rhythmTotalLength = getTotalLengthFromRhythm(this->rhythmP);
@@ -88,7 +88,22 @@ void RhythmPlayer::loadNextRhythm() {
         default:
             switch (this->rhythmMode) {
                 case RhythmMode::RhythmMode_Reciprocate:
-                    // TODO
+                    switch (this->playDirection) {
+                        case PlayDirection::PlayDirection_Default:
+                        case PlayDirection::PlayDirection_Forward:
+                            this->playDirection = PlayDirection::PlayDirection_Reverse;
+                            this->playIntervalCount = 0;
+                            this->loadNextSummary(this->calcNextSummaryIndex(true));
+                            return;
+                        case PlayDirection::PlayDirection_Reverse:
+                            this->playDirection = PlayDirection::PlayDirection_Forward;
+                            this->playIntervalCount = 0;
+                            this->loadNextSummary(this->calcNextSummaryIndex(true));
+                            return;
+                        case PlayDirection::PlayDirection_Random:
+                            this->loadRhythm((uint16_t) random(0, RhythmTableSize));
+                            return;
+                    }
                     return;
                 case RhythmMode::RhythmMode_Loop:
                 default:
@@ -125,7 +140,10 @@ int16_t RhythmPlayer::calcNextSummaryIndex(boolean initMode) {
             if (this->playSummaryIndex + 1 >= this->rhythmTotalLength) {
                 this->loadNextRhythm();
             }
-            return this->playSummaryIndex + 1;
+            if (PlayDirection::PlayDirection_Forward == this->playDirection) {
+                return this->playSummaryIndex + 1;
+            }
+            return this->calcNextSummaryIndex(true);
         case PlayDirection::PlayDirection_Reverse:
             if (initMode) {
                 return this->rhythmTotalLength - 1;
@@ -136,7 +154,10 @@ int16_t RhythmPlayer::calcNextSummaryIndex(boolean initMode) {
             if (this->playSummaryIndex >= this->rhythmTotalLength) {
                 return this->rhythmTotalLength - 1;
             }
-            return this->playSummaryIndex - 1;
+            if (PlayDirection::PlayDirection_Reverse == this->playDirection) {
+                return this->playSummaryIndex - 1;
+            }
+            return this->calcNextSummaryIndex(true);
         case PlayDirection::PlayDirection_Random:
             return random(0, this->rhythmTotalLength);
         case PlayDirection::PlayDirection_Default:
@@ -152,7 +173,10 @@ int16_t RhythmPlayer::calcNextSummaryIndex(boolean initMode) {
                     if (this->playSummaryIndex >= this->rhythmTotalLength) {
                         return this->rhythmTotalLength - 1;
                     }
+                    if (PlayDirection::PlayDirection_Reverse == this->playDirection) {
                     return this->playSummaryIndex - 1;
+                    }
+                    return this->calcNextSummaryIndex(true);
                 case RhythmDirection::RhythmDirection_Random:
                     return random(0, this->rhythmTotalLength);
                 case RhythmDirection::RhythmDirection_Forward:
@@ -166,7 +190,10 @@ int16_t RhythmPlayer::calcNextSummaryIndex(boolean initMode) {
                     if (this->playSummaryIndex + 1 >= this->rhythmTotalLength) {
                         this->loadNextRhythm();
                     }
-                    return this->playSummaryIndex + 1;
+                    if (PlayDirection::PlayDirection_Forward == this->playDirection) {
+                        return this->playSummaryIndex + 1;
+                    }
+                    return this->calcNextSummaryIndex(true);
                     break;
             }
             break;
