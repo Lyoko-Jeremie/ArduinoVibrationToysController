@@ -15,10 +15,26 @@ void key_test(uint8_t edge, uint8_t keynum);
 void setup() {
 
     Serial.begin(9600);
+
+    // load a random seed from D13
+    randomSeed(analogRead(13));
+
+//    // randomSeed(micros());
+//    for (int j = 0; j < 100; ++j) {
+//        Serial.print(random(0, 3));
+//        Serial.print(" ");
+//        if (j % 30 == 29) {
+//            Serial.print("\n");
+//        }
+//    }
+//    Serial.print("\n");
+//    return;
+
+    Serial.begin(9600);
 //    testCheckRhythmTable();
 
     delay(1000);
-    RhythmPlayer r1(2, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default);
+    RhythmPlayer r1(2, PlayMode::PlayMode_Random, PlayDirection::PlayDirection_Default);
 //    RhythmPlayer r2(0);
 //    RhythmPlayer r3(0);
     for (int i = 0; i < 200; ++i) {
