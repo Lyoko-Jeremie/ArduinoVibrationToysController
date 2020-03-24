@@ -15,7 +15,21 @@ void key_test(uint8_t edge, uint8_t keynum);
 void setup() {
 
     Serial.begin(9600);
-    testCheckRhythmTable();
+//    testCheckRhythmTable();
+
+    delay(1000);
+    RhythmPlayer r1(0, PlayMode::PlayMode_Default);
+//    RhythmPlayer r2(0);
+//    RhythmPlayer r3(0);
+    for (int i = 0; i < 50; ++i) {
+//        r1.debugPrint();
+        Serial.print("i: ");
+        Serial.print((uint16_t) r1.getNextNote());
+        Serial.print("\n");
+    }
+//    Serial.print(r1.getNextNote());
+//    Serial.print(r2.getNextNote());
+//    Serial.print(r3.getNextNote());
     return;
 
 

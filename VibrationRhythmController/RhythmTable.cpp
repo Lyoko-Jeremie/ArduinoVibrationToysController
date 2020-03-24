@@ -43,12 +43,12 @@ const PROGMEM RhythmDataType name[rhythm_head_length + total_length * 2] = {    
 }
 
 
-MAKE_Rhythm(R1, 2, RhythmMode::Loop,
+MAKE_Rhythm(R1, 2, RhythmMode::RhythmMode_Loop,
             +0, 15,
             +100, 5,
 );
 
-MAKE_Rhythm(R2, 8, RhythmMode::Loop,
+MAKE_Rhythm(R2, 8, RhythmMode::RhythmMode_Loop,
             +0, 5,
             +100, 5,
             +500, 5,
@@ -59,7 +59,7 @@ MAKE_Rhythm(R2, 8, RhythmMode::Loop,
             -500, 5,
 );
 
-MAKE_Rhythm(R3, 8, RhythmMode::Reciprocate,
+MAKE_Rhythm(R3, 8, RhythmMode::RhythmMode_Reciprocate,
             +0, 5,
             +100, 5,
             +500, 5,
