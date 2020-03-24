@@ -61,7 +61,7 @@ void RhythmPlayer::loadRhythm(uint16_t rhythmIndex) {
         rhythmIndex = 0;
     }
 //    Serial.print("jump to rhythm:");
-//    Serial.print(this->rhythmIndex);
+//    Serial.print(rhythmIndex);
 //    Serial.print("\n");
     this->rhythmIndex = rhythmIndex;
     this->rhythmP = getRhythmFromTable(rhythmIndex);
