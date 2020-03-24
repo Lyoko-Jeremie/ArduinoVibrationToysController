@@ -41,17 +41,18 @@ void testCheckRhythmTable() {
 }
 
 
-RhythmPlayer::RhythmPlayer(uint16_t rhythmIndex, uint16_t playMode) {
-    this->init(rhythmIndex, playMode);
+RhythmPlayer::RhythmPlayer(uint16_t rhythmIndex, uint16_t playMode, uint16_t playDirection) {
+    this->init(rhythmIndex, playMode, playDirection);
 }
 
-void RhythmPlayer::init(uint16_t rhythmIndex, uint16_t playMode) {
+void RhythmPlayer::init(uint16_t rhythmIndex, uint16_t playMode, uint16_t playDirection) {
 //    Serial.print("RhythmPlayer::RhythmPlayer");
 //    Serial.print(rhythmIndex);
 //    Serial.print("\t");
 //    Serial.print(playMode);
 //    Serial.print("\n");
     this->playMode = playMode;
+    this->playDirection = playDirection;
     this->loadRhythm(rhythmIndex);
 }
 
@@ -66,53 +67,122 @@ void RhythmPlayer::loadRhythm(uint16_t rhythmIndex) {
     this->rhythmP = getRhythmFromTable(rhythmIndex);
     this->rhythmTotalLength = getTotalLengthFromRhythm(this->rhythmP);
     this->rhythmMode = getModeFromRhythm(this->rhythmP);
-    this->rhythmNoteIndex = 0;
-    this->loadNextSummary(this->rhythmNoteIndex);
+    this->rhythmDirection = getDirectionFromRhythm(this->rhythmP);
+    this->playIntervalCount = 0;
+    this->playSummaryIndex = this->calcNextSummaryIndex(true);
+    this->loadNextSummary(this->playSummaryIndex);
 }
 
-void RhythmPlayer::loadNextSummary(uint16_t nextSummaryIndex) {
-    if (nextSummaryIndex >= this->rhythmTotalLength) {
-        switch (this->playMode) {
-            case PlayMode::PlayMode_Loop:
-                nextSummaryIndex = 0;
-                break;
-            case PlayMode::PlayMode_Next:
-                this->loadRhythm(this->rhythmIndex + 1);
-                return;
-            case PlayMode::PlayMode_Random:
-                this->loadRhythm((uint16_t) random(0, RhythmTableSize));
-                return;
-            case PlayMode::PlayMode_Default:
-            default:
-                switch (this->rhythmMode) {
-                    case RhythmMode::RhythmMode_Reciprocate:
-                        // TODO
-                        break;
-                    case RhythmMode::RhythmMode_Loop:
-                    default:
-                        nextSummaryIndex = 0;
-                        break;
-                }
-                break;
-        }
+void RhythmPlayer::loadNextRhythm() {
+    switch (this->playMode) {
+        case PlayMode::PlayMode_Loop:
+            this->playIntervalCount = 0;
+            return;
+        case PlayMode::PlayMode_Next:
+            this->loadRhythm(this->rhythmIndex + 1);
+            return;
+        case PlayMode::PlayMode_Random:
+            this->loadRhythm((uint16_t) random(0, RhythmTableSize));
+            return;
+        case PlayMode::PlayMode_Default:
+        default:
+            switch (this->rhythmMode) {
+                case RhythmMode::RhythmMode_Reciprocate:
+                    // TODO
+                    return;
+                case RhythmMode::RhythmMode_Loop:
+                default:
+                    this->playIntervalCount = 0;
+                    return;
+                    break;
+            }
+            break;
     }
-    this->rhythmNoteIndex = nextSummaryIndex;
+}
+
+void RhythmPlayer::loadNextSummary(int16_t nextSummaryIndex) {
+    if (nextSummaryIndex >= this->rhythmTotalLength || nextSummaryIndex < 0) {
+        this->loadNextRhythm();
+    }
+    this->playSummaryIndex = nextSummaryIndex;
     this->rhythmNoteOffset = getRhythmOffsetFromRhythm(this->rhythmP, nextSummaryIndex);
     this->rhythmNoteIntervalCount = getIntervalCountFromRhythm(this->rhythmP, nextSummaryIndex);
     this->playIntervalCount = 0;
 //    Serial.print("jump to summary:");
-//    Serial.print(this->rhythmNoteIndex);
+//    Serial.print(this->playSummaryIndex);
 //    Serial.print("\n");
+}
+
+int16_t RhythmPlayer::calcNextSummaryIndex(boolean initMode) {
+    switch (this->playDirection) {
+        case PlayDirection::PlayDirection_Forward:
+            if (initMode) {
+                return 0;
+            }
+            if (this->playSummaryIndex < 0) {
+                return 0;
+            }
+            if (this->playSummaryIndex + 1 >= this->rhythmTotalLength) {
+                this->loadNextRhythm();
+            }
+            return this->playSummaryIndex + 1;
+        case PlayDirection::PlayDirection_Reverse:
+            if (initMode) {
+                return this->rhythmTotalLength - 1;
+            }
+            if (this->playSummaryIndex - 1 < 0) {
+                this->loadNextRhythm();
+            }
+            if (this->playSummaryIndex >= this->rhythmTotalLength) {
+                return this->rhythmTotalLength - 1;
+            }
+            return this->playSummaryIndex - 1;
+        case PlayDirection::PlayDirection_Random:
+            return random(0, this->rhythmTotalLength);
+        case PlayDirection::PlayDirection_Default:
+        default:
+            switch (this->rhythmDirection) {
+                case RhythmDirection::RhythmDirection_Reverse:
+                    if (initMode) {
+                        return this->rhythmTotalLength - 1;
+                    }
+                    if (this->playSummaryIndex - 1 < 0) {
+                        this->loadNextRhythm();
+                    }
+                    if (this->playSummaryIndex >= this->rhythmTotalLength) {
+                        return this->rhythmTotalLength - 1;
+                    }
+                    return this->playSummaryIndex - 1;
+                case RhythmDirection::RhythmDirection_Random:
+                    return random(0, this->rhythmTotalLength);
+                case RhythmDirection::RhythmDirection_Forward:
+                default:
+                    if (initMode) {
+                        return 0;
+                    }
+                    if (this->playSummaryIndex < 0) {
+                        return 0;
+                    }
+                    if (this->playSummaryIndex + 1 >= this->rhythmTotalLength) {
+                        this->loadNextRhythm();
+                    }
+                    return this->playSummaryIndex + 1;
+                    break;
+            }
+            break;
+    }
 }
 
 RhythmDataType RhythmPlayer::getNextNote() {
     if (this->playIntervalCount >= this->rhythmNoteIntervalCount) {
         // this summary play end, jump to next
         //Serial.print("this summary play end, jump to next\n");
-        this->loadNextSummary(this->rhythmNoteIndex + 1);
+//        this->loadNextSummary(this->playSummaryIndex + 1);
+        this->loadNextSummary(this->calcNextSummaryIndex());
     } else {
         ++this->playIntervalCount;
     }
     return this->rhythmNoteOffset;
 }
+
 

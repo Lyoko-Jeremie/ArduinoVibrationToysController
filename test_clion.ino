@@ -18,7 +18,7 @@ void setup() {
 //    testCheckRhythmTable();
 
     delay(1000);
-    RhythmPlayer r1(0, PlayMode::PlayMode_Default);
+    RhythmPlayer r1(0, PlayMode::PlayMode_Next, PlayDirection::PlayDirection_Reverse);
 //    RhythmPlayer r2(0);
 //    RhythmPlayer r3(0);
     for (int i = 0; i < 50; ++i) {

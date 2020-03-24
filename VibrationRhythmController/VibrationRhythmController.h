@@ -16,6 +16,13 @@ enum PlayMode {
     PlayMode_Random = 3,
 };
 
+enum PlayDirection {
+    PlayDirection_Default = 0,
+    PlayDirection_Forward = 1,
+    PlayDirection_Reverse = 2,
+    PlayDirection_Random = 3,
+};
+
 class RhythmPlayer {
     // rhythm info
     uint16_t rhythmIndex;
@@ -23,12 +30,14 @@ class RhythmPlayer {
     // rhythm head
     uint16_t rhythmTotalLength;
     uint16_t rhythmMode;
+    uint16_t rhythmDirection;
     // rhythm summary info
-    uint16_t rhythmNoteIndex;
     uint16_t rhythmNoteOffset{0};
     uint16_t rhythmNoteIntervalCount{1};
     // playing info
+    int16_t playSummaryIndex;
     uint16_t playMode{PlayMode::PlayMode_Default};
+    uint16_t playDirection{PlayDirection::PlayDirection_Forward};
     uint16_t playIntervalCount{0};
 public:
     void debugPrint() {
@@ -42,7 +51,7 @@ public:
         Serial.print(this->rhythmMode);
         Serial.print("\n");
 
-        Serial.print(this->rhythmNoteIndex);
+        Serial.print(this->playSummaryIndex);
         Serial.print("\t");
         Serial.print(this->rhythmNoteOffset);
         Serial.print("\t");
@@ -56,14 +65,18 @@ public:
     }
 
 public:
-    RhythmPlayer(uint16_t rhythmIndex, uint16_t playMode = PlayMode::PlayMode_Default);
+    RhythmPlayer(uint16_t rhythmIndex, uint16_t playMode = PlayMode::PlayMode_Default,
+                 uint16_t playDirection = PlayDirection::PlayDirection_Default);
 
-    void init(uint16_t rhythmIndex, uint16_t playMode);
+    void init(uint16_t rhythmIndex, uint16_t playMode, uint16_t playDirection);
 
     void loadRhythm(uint16_t rhythmIndex);
 
 protected:
-    void loadNextSummary(uint16_t nextSummaryIndex);
+    void loadNextSummary(int16_t nextSummaryIndex);
+    void loadNextRhythm();
+
+    int16_t calcNextSummaryIndex(boolean initMode = false);
 
 public:
     RhythmDataType getNextNote();

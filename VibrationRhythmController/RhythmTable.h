@@ -14,4 +14,10 @@ enum RhythmMode {
     RhythmMode_Reciprocate = 2,
 };
 
+enum RhythmDirection {
+    RhythmDirection_Forward = 1,
+    RhythmDirection_Reverse = 2,
+    RhythmDirection_Random = 3,
+};
+
 #endif //H_RHYTHMTABLE_H
