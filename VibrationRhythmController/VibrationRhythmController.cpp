@@ -67,6 +67,9 @@ void RhythmPlayer::loadRhythm(uint16_t rhythmIndex) {
     if (RhythmTableSize <= rhythmIndex) {
         rhythmIndex = 0;
     }
+//    Serial.print("jump to rhythm:");
+//    Serial.print(rhythmIndex);
+//    Serial.print("\n");
     debugP("jump to rhythm:");
     debugPV(rhythmIndex);
     debugP("\n");
