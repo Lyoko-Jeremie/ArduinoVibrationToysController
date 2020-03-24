@@ -11,7 +11,7 @@ extern const RhythmDataType RhythmTableSize;
 
 enum RhythmMode {
     RhythmMode_Loop = 1,
-    RhythmMode_Reciprocate = 2,
+//    RhythmMode_Reciprocate = 2,
 };
 
 enum RhythmDirection {

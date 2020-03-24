@@ -61,7 +61,7 @@ MAKE_Rhythm(R2, 8, RhythmMode::RhythmMode_Loop, RhythmDirection::RhythmDirection
             -500, 5,
 );
 
-MAKE_Rhythm(R3, 8, RhythmMode::RhythmMode_Reciprocate, RhythmDirection::RhythmDirection_Forward,
+MAKE_Rhythm(R3, 8, RhythmMode::RhythmMode_Loop, RhythmDirection::RhythmDirection_Forward,
             +0, 5,
             +100, 5,
             +500, 5,
