@@ -18,13 +18,13 @@ void setup() {
 //    testCheckRhythmTable();
 
     delay(1000);
-    RhythmPlayer r1(0, PlayMode::PlayMode_Next, PlayDirection::PlayDirection_Reverse);
+    RhythmPlayer r1(2, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default);
 //    RhythmPlayer r2(0);
 //    RhythmPlayer r3(0);
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 200; ++i) {
 //        r1.debugPrint();
         Serial.print("i: ");
-        Serial.print((uint16_t) r1.getNextNote());
+        Serial.print((int16_t) r1.getNextNote());
         Serial.print("\n");
     }
 //    Serial.print(r1.getNextNote());
