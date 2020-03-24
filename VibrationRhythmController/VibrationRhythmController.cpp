@@ -60,9 +60,9 @@ void RhythmPlayer::loadRhythm(uint16_t rhythmIndex) {
     if (RhythmTableSize <= rhythmIndex) {
         rhythmIndex = 0;
     }
-//    Serial.print("jump to rhythm:");
-//    Serial.print(rhythmIndex);
-//    Serial.print("\n");
+    Serial.print("jump to rhythm:");
+    Serial.print(rhythmIndex);
+    Serial.print("\n");
     this->rhythmIndex = rhythmIndex;
     this->rhythmP = getRhythmFromTable(rhythmIndex);
     this->rhythmTotalLength = getTotalLengthFromRhythm(this->rhythmP);
@@ -87,11 +87,12 @@ void RhythmPlayer::loadNextRhythm() {
         case PlayMode::PlayMode_Default:
         default:
             switch (this->rhythmMode) {
-                case RhythmMode::RhythmMode_Reciprocate:
-                    // TODO
-                    return;
+//                case RhythmMode::RhythmMode_Reciprocate:
+//                    // TODO
+//                    return;
                 case RhythmMode::RhythmMode_Loop:
                 default:
+                    this->playSummaryIndex = 0;
                     this->playIntervalCount = 0;
                     return;
                     break;
