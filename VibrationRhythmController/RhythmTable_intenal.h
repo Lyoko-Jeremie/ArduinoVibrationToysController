@@ -9,6 +9,7 @@
 
 //extern const PROGMEM RhythmDataType *RhythmTable[];
 extern const RhythmDataType total_length_offset;
+extern const RhythmDataType mode_offset;
 extern const RhythmDataType rhythm_begin_offset;
 extern const RhythmDataType rhythm_type_size;
 
@@ -16,9 +17,12 @@ RhythmDataType *_getRhythmFromTable(uint16_t i);
 
 int16_t _getTotalLengthFromRhythm(RhythmDataType *r);
 
+int16_t _getModeFromRhythm(RhythmDataType *r);
+
 RhythmDataType _getRhythmOffsetFromRhythm(RhythmDataType *r, uint16_t i);
 
 RhythmDataType _getIntervalCountFromRhythm(RhythmDataType *r, uint16_t i);
+
 
 
 #define getRhythmFromTable(i) \
@@ -28,6 +32,10 @@ _getRhythmFromTable(i)
 #define getTotalLengthFromRhythm(r) \
 _getTotalLengthFromRhythm(r)
 //(int16_t) pgm_read_word(r + total_length_offset)
+
+#define getModeFromRhythm(r) \
+_getModeFromRhythm(r)
+//(int16_t) pgm_read_word(r + mode_offset)
 
 #define getRhythmOffsetFromRhythm(r, i) \
 _getRhythmOffsetFromRhythm(r, i)

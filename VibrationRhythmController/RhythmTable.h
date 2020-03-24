@@ -9,4 +9,9 @@ typedef int16_t RhythmDataType;
 
 extern const RhythmDataType RhythmTableSize;
 
+enum RhythmMode {
+    Loop = 1,
+    Reciprocate = 2,
+};
+
 #endif //H_RHYTHMTABLE_H

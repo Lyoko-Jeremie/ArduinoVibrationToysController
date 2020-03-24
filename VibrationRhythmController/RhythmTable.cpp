@@ -26,26 +26,29 @@
 
 #define rhythm_head_length 4
 
+// dont need to ```rhythm_head_length * rhythm_type_size```
 const int16_t rhythm_type_size = sizeof(RhythmDataType);
-// by byte
-const int16_t total_length_offset = 0 * rhythm_type_size;
-// by byte
-const int16_t rhythm_begin_offset = rhythm_head_length; // dont need to ```rhythm_head_length * rhythm_type_size```
 
-#define MAKE_Rhythm(name, total_length, args...)                                \
+const int16_t total_length_offset = 0/* * rhythm_type_size*/;
+
+const int16_t mode_offset = 1/* * rhythm_type_size*/;
+
+const int16_t rhythm_begin_offset = rhythm_head_length;
+
+#define MAKE_Rhythm(name, total_length, rhythm_mode, args...)                                \
 const PROGMEM RhythmDataType name[rhythm_head_length + total_length * 2] = {    \
-        total_length, 0,                                                        \
+        total_length, rhythm_mode,                                                        \
         0, 0,                                                                   \
         ##args                                                                  \
 }
 
 
-MAKE_Rhythm(R1, 2,
+MAKE_Rhythm(R1, 2, RhythmMode::Loop,
             +0, 15,
             +100, 5,
 );
 
-MAKE_Rhythm(R2, 8,
+MAKE_Rhythm(R2, 8, RhythmMode::Loop,
             +0, 5,
             +100, 5,
             +500, 5,
@@ -56,7 +59,7 @@ MAKE_Rhythm(R2, 8,
             -500, 5,
 );
 
-MAKE_Rhythm(R3, 8,
+MAKE_Rhythm(R3, 8, RhythmMode::Reciprocate,
             +0, 5,
             +100, 5,
             +500, 5,
@@ -86,6 +89,10 @@ int16_t _getTotalLengthFromRhythm(RhythmDataType *r) {
 //    }
 //    Serial.print("\n");
     return (int16_t) pgm_read_word(r + total_length_offset);
+}
+
+int16_t _getModeFromRhythm(RhythmDataType *r) {
+    return (int16_t) pgm_read_word(r + mode_offset);
 }
 
 RhythmDataType _getRhythmOffsetFromRhythm(RhythmDataType *r, uint16_t i) {
