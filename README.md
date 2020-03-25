@@ -1,6 +1,20 @@
 # Arduino Vibration Toys Controller
 
+[简体中文](./README-CN.md)
+
 this is a Arduino project write to implement a Controller for DIY Vibration Toys
+
+
+## now info
+
+Now , the dev base on Arduino UNO , with 3 Servos support and a 4x4 matrix keyboard to control the Servos. you can buy it from many ways. 
+
+Example, you can buy a Chinese low-cost version Arduino UNO from Alibaba ( or we also call it Taobao) by about 4.5$ USD (or ¥30 RMB). 
+
+the 4x4 matrix keyboard cost about 1$ USD (or ¥7 RMB). 
+
+when dev, use 3 SG90 9g Servos to instead Electronic Speed Control and Motor in real Vibration Toys, those 3 Servos every cost about 1.5$ USD (or ¥10 RMB) . 
+
 
 
 ## How to dev it
