@@ -2,105 +2,128 @@
 
 #include "4x4MatrixKeyboard/4x4MatrixKeyboard.h"
 #include "VibrationRhythmController/VibrationRhythmController.h"
+#include "BoolBitStorage/BoolBitStorage.h"
 
 // test PWM
 
 #include <Servo.h>
 
+#define MaxServosNum 3
 
-Servo servos[3];
+Servo servos[MaxServosNum];
+RhythmPlayer *rp;
 
 void key_test(uint8_t edge, uint8_t keynum);
 
+void regKeyCallBack();
+
 void setup() {
 
-    Serial.begin(9600);
+//    Serial.begin(9600);
+//    BoolBit8 b = 0;
+//
+//    delay(1000);
+//    for (int i = 0; i < 8; ++i) {
+//        Serial.print("---- i: \t");
+//        Serial.print(i);
+//        Serial.print('\t');
+//        Serial.print(getBoolBit(b, i));
+//        Serial.print('\t');
+//        setBoolBit(b, i, 1);
+//        Serial.print(getBoolBit(b, i));
+//        Serial.print('\t');
+//        Serial.print(b);
+//        Serial.print('\t');
+//        setBoolBit(b, i, 0);
+//        Serial.print(getBoolBit(b, i));
+//        Serial.print('\t');
+//        Serial.print(b);
+//        Serial.print('\t');
+//        setBoolBit(b, i, 1);
+//        Serial.print(getBoolBit(b, i));
+//        Serial.print('\t');
+//        Serial.print(b);
+//        Serial.print('\n');
+//        setBoolBit(b, i, 0);
+//    }
+//
+//    return;
 
     // load a random seed from D13
     randomSeed(analogRead(13));
 
-//    // randomSeed(micros());
-//    for (int j = 0; j < 100; ++j) {
-//        Serial.print(random(0, 3));
-//        Serial.print(" ");
-//        if (j % 30 == 29) {
-//            Serial.print("\n");
-//        }
-//    }
-//    Serial.print("\n");
-//    return;
+    // init RhythmPlayer
+    rp = new RhythmPlayer[MaxServosNum]{
+            {0, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default},
+            {0, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default},
+            {0, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default},
+    };
 
-    Serial.begin(9600);
-//    testCheckRhythmTable();
-
-    delay(1000);
-    RhythmPlayer r1(2, PlayMode::PlayMode_Random, PlayDirection::PlayDirection_Default);
-//    RhythmPlayer r2(0);
-//    RhythmPlayer r3(0);
-    for (int i = 0; i < 200; ++i) {
-//        r1.debugPrint();
-        Serial.print("i: ");
-        Serial.print((int16_t) r1.getNextNote());
-        Serial.print("\n");
-    }
-//    Serial.print(r1.getNextNote());
-//    Serial.print(r2.getNextNote());
-//    Serial.print(r3.getNextNote());
-    return;
-
-
+    // init Keyboard
     initPortState();
-    setCallBackFunction(0, key_test);
-    setCallBackFunction(0, key_test);
-    setCallBackFunction(1, key_test);
-    setCallBackFunction(2, key_test);
-    setCallBackFunction(3, key_test);
-    setCallBackFunction(4, key_test);
-    setCallBackFunction(5, key_test);
-    setCallBackFunction(6, key_test);
-    setCallBackFunction(7, key_test);
-    setCallBackFunction(8, key_test);
-    setCallBackFunction(9, key_test);
-    setCallBackFunction(10, key_test);
-    setCallBackFunction(11, key_test);
-    setCallBackFunction(12, key_test);
-    setCallBackFunction(13, key_test);
-    setCallBackFunction(14, key_test);
-    setCallBackFunction(15, key_test);
+    regKeyCallBack();
 
+    // init servos
     servos[0].attach(10);
     servos[1].attach(11);
     servos[2].attach(12);
+
+    // init serial
     Serial.begin(9600);
+
 }
 
-void sleep(unsigned long ms) {
-    ScanKeyAndCallKeyCallBackFunction();
-    delay(ms);
-}
 
-void mode1();
+#define isTotalStart 0
+#define isTotalPause 1
+#define isServosPauseBase 2
+#define isServos1Pause (isServosPauseBase+0)
+#define isServos2Pause (isServosPauseBase+1)
+#define isServos3Pause (isServosPauseBase+2)
+BoolBit8 state = 0;
 
-void mode2();
-
-void mode3();
+#define maxLevel 2000
+#define minLevel 1000
+#define baseLevel 1500
+int16_t servosLevel[MaxServosNum] = {
+        baseLevel,
+        baseLevel,
+        baseLevel,
+};
+#define maxLevelOffset 10
+#define mixLevelOffset 0.1
+#define baseLevelOffset 1
+#define levelOffsetAddStep 1.2
+#define levelOffsetSubStep 0.833
+float levelOffset[MaxServosNum] = {
+        baseLevelOffset,
+        baseLevelOffset,
+        baseLevelOffset,
+};
 
 void loop() {
 
-//    delay(5000);
-    return;
-
-//    key_test(5, 20);
     ScanKeyAndCallKeyCallBackFunction();
 
+    if (getBoolBit(state, isTotalStart) & !getBoolBit(state, isTotalPause)) {
+        for (int i = 0; i < MaxServosNum; ++i) {
+            if (!getBoolBit(state, isServosPauseBase + i)) {
+                // servos[i].writeMicroseconds(rp[i].getNextNote());
+                int16_t orgL = rp[i].getNextNote();
+                servosLevel[i] = (int16_t) ((float) orgL * levelOffset[i]) + baseLevel;
+                if (servosLevel[i] > maxLevel) {
+                    servosLevel[i] = maxLevel;
+                }
+                if (servosLevel[i] < minLevel) {
+                    servosLevel[i] = minLevel;
+                }
+                servos[i].writeMicroseconds(servosLevel[i]);
+            }
+        }
+    } else {
+    }
 
-
-//    Serial.print("millis = ");
-//    Serial.print(millis());
-//    Serial.print("\n");
-//    mode3();
-//    mode1();
-//    mode2();
+    delay(10);
 }
 
 void key_test(uint8_t edge, uint8_t keynum) {
@@ -111,92 +134,190 @@ void key_test(uint8_t edge, uint8_t keynum) {
     Serial.print("\n");
 }
 
-void mode1() {
-
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-    for (int i = 0; i < 100; ++i) {
-        int val = map(i, 0, 100, 1000, 2000);
-        servos[0].writeMicroseconds(val);
-        servos[1].writeMicroseconds(val);
-        servos[2].writeMicroseconds(val);
-        sleep(15);
-    }
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-
-}
-
-void mode2() {
-
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-    for (int i = 0; i < 100; ++i) {
-        int val = map(i, 0, 100, 2000, 1000);
-        servos[0].writeMicroseconds(val);
-        servos[1].writeMicroseconds(val);
-        servos[2].writeMicroseconds(val);
-        sleep(15);
-    }
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-
-}
-
-
-void mode3() {
-
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-    int val;
-    for (int i = 0; i < 100; ++i) {
-        val = map(i, 0, 100, 2000, 1000);
-        servos[0].writeMicroseconds(val);
-        val = map(i, 0, 100, 1000, 2000);
-        servos[1].writeMicroseconds(val);
-        if (i < (100 / 2)) {
-            val = map(i * 2, 0, 100, 1000, 2000);
-        } else {
-            val = map(100 - (i - (100 / 2)) * 2, 0, 100, 1000, 2000);
-        }
-        servos[2].writeMicroseconds(val);
-        if (i == 0) {
-            sleep(100);
-        } else {
-            sleep(15);
+int8_t getServoNum() {
+    for (uint8_t i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            return i;
         }
     }
-    for (int j = 0; j < 10; ++j) {
-        servos[0].writeMicroseconds(1500);
-        servos[1].writeMicroseconds(1500);
-        servos[2].writeMicroseconds(1500);
-        sleep(50);
-    }
-
+    return -1;
 }
 
+//
+void key_total_start(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    if (!getBoolBit(state, isTotalStart)) {
+        // init Rhythm
+        for (int i = 0; i < MaxServosNum; ++i) {
+            rp[i].init(0, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default);
+        }
+    }
+    setBoolBit(state, isTotalStart, 1);
+    if (getBoolBit(state, isTotalPause)) {
+        // last in pause state
+        setBoolBit(state, isTotalPause, 0);
+    }
+    for (int j = 0; j < MaxServosNum; ++j) {
+        levelOffset[j] = baseLevelOffset;
+    }
+}
 
+void key_total_stop(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    setBoolBit(state, isTotalStart, 0);
+    setBoolBit(state, isTotalPause, 0);
+    for (int j = 0; j < MaxServosNum; ++j) {
+        levelOffset[j] = baseLevelOffset;
+    }
+    // clean Rhythm
+    for (int i = 0; i < MaxServosNum; ++i) {
+        rp[i].init(0, PlayMode::PlayMode_Default, PlayDirection::PlayDirection_Default);
+    }
+}
 
+void key_total_pause(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    uint8_t lastState = getBoolBit(state, isTotalPause);
+    setBoolBit(state, isTotalPause, !lastState);
+}
 
+void key_total_strength(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (int i = 0; i < MaxServosNum; ++i) {
+        levelOffset[i] *= levelOffsetAddStep;
+        if (levelOffset[i] > maxLevelOffset) {
+            levelOffset[i] = maxLevelOffset;
+        }
+    }
+}
 
+void key_total_weak(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (int i = 0; i < MaxServosNum; ++i) {
+        levelOffset[i] *= levelOffsetSubStep;
+        if (levelOffset[i] < mixLevelOffset) {
+            levelOffset[i] = mixLevelOffset;
+        }
+    }
+}
 
+void key_one_next(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (uint8_t i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            rp[i].forceNextRhythm();
+        }
+    }
+}
+
+void key_one_last(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (uint8_t i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            rp[i].forceLastRhythm();
+        }
+    }
+}
+
+//
+void key_one_pause(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (uint8_t i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            uint8_t lastState = getBoolBit(state, isServosPauseBase + i);
+            setBoolBit(state, isServosPauseBase + i, !lastState);
+        }
+    }
+}
+
+void key_one_strength(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (int i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            levelOffset[i] *= levelOffsetAddStep;
+            if (levelOffset[i] > maxLevelOffset) {
+                levelOffset[i] = maxLevelOffset;
+            }
+        }
+    }
+}
+
+void key_one_weak(uint8_t edge, uint8_t keynum) {
+    if (!edge) {
+        return;
+    }
+    for (int i = 0; i < MaxServosNum; ++i) {
+        if (GetKeyState(i)) {
+            levelOffset[i] *= levelOffsetSubStep;
+            if (levelOffset[i] < mixLevelOffset) {
+                levelOffset[i] = mixLevelOffset;
+            }
+        }
+    }
+}
+
+void key_reset_levelOffset(uint8_t edge, uint8_t keynum) {
+    uint8_t n = getServoNum();
+    if (n == -1) {
+        // if any Servo be selected
+        // reset all
+        for (int i = 0; i < MaxServosNum; ++i) {
+            levelOffset[i] = baseLevelOffset;
+        }
+    } else {
+        for (int i = 0; i < MaxServosNum; ++i) {
+            if (GetKeyState(i)) {
+                levelOffset[i] = baseLevelOffset;
+            }
+        }
+    }
+}
+
+//
+void key_total_next(uint8_t edge, uint8_t keynum) {}
+
+void key_total_last(uint8_t edge, uint8_t keynum) {}
+
+/**************************************
+ *    |0       |1      |2      |3
+ * ---|--------|-------|-------|-------
+ * 0  |1       |2      |3      |o_pause
+ * 4  |o_next  |o_last |o_st   |o_wk
+ * 8  |t_str   |t_weak |t_next |t_last
+ * 12 |t_start |t_stop |t_pause|reset_levelOffset
+ * ************************************
+ *
+ */
+void regKeyCallBack() {
+    setCallBackFunction(3, key_one_pause);
+    setCallBackFunction(4, key_one_next);
+    setCallBackFunction(5, key_one_last);
+    setCallBackFunction(6, key_one_strength);
+    setCallBackFunction(7, key_one_weak);
+    setCallBackFunction(8, key_total_strength);
+    setCallBackFunction(9, key_total_weak);
+    setCallBackFunction(10, key_total_next);
+    setCallBackFunction(11, key_total_last);
+    setCallBackFunction(12, key_total_start);
+    setCallBackFunction(13, key_total_stop);
+    setCallBackFunction(14, key_total_pause);
+    setCallBackFunction(15, key_reset_levelOffset);
+}
