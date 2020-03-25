@@ -209,5 +209,5 @@ void ScanKeyAndCallKeyCallBackFunction() {
 }
 
 uint8_t GetKeyState(uint8_t i) {
-    return AKstate[i / 4][i % 4] & 0x2u;
+    return (AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u;
 }
