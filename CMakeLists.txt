@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/ArduinoToolchain.cmake)
 set(CMAKE_CXX_STANDARD 11)
-set(PROJECT_NAME TestClion)
+set(PROJECT_NAME ArduinoVibrationToysController)
 
 set(${PROJECT_NAME}_BOARD uno)
 # set(ARDUINO_CPU)
@@ -15,7 +15,7 @@ project(${PROJECT_NAME})
 # set(${PROJECT_NAME}_LIBS)
 
 ### Main sketch file
-set(${PROJECT_NAME}_SKETCH test_clion.ino)
+set(${PROJECT_NAME}_SKETCH ArduinoVibrationToysController.ino)
 
 ### Add project directories into the build
 #set(ENABLE_MAXIMIZE_MODE ON)   # not work

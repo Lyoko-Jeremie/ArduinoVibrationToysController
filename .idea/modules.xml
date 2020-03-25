@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TestClion.iml" filepath="$PROJECT_DIR$/.idea/TestClion.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ArduinoVibrationToysController.iml" filepath="$PROJECT_DIR$/.idea/ArduinoVibrationToysController.iml" />
     </modules>
   </component>
 </project>
