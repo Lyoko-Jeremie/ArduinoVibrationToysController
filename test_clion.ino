@@ -296,6 +296,10 @@ void key_total_next(uint8_t edge, uint8_t keynum) {}
 
 void key_total_last(uint8_t edge, uint8_t keynum) {}
 
+void key_set_mode(uint8_t edge, uint8_t keynum) {}
+
+void key_set_direction(uint8_t edge, uint8_t keynum) {}
+
 /**************************************
  *    |0       |1      |2      |3
  * ---|--------|-------|-------|-------
