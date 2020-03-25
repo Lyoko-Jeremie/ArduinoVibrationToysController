@@ -37,11 +37,11 @@ const int16_t direction_offset = 2/* * rhythm_type_size*/;
 
 const int16_t rhythm_begin_offset = rhythm_head_length;
 
-#define MAKE_Rhythm(name, total_length, rhythm_mode, rhythm_direction, args...)                                \
-const PROGMEM RhythmDataType name[rhythm_head_length + total_length * 2] = {    \
-        total_length, rhythm_mode,                                                        \
-        rhythm_direction, 0,                                                                   \
-        ##args                                                                  \
+#define MAKE_Rhythm(name, total_length, rhythm_mode, rhythm_direction, args...)         \
+const PROGMEM RhythmDataType name[rhythm_head_length + total_length * 2] = {            \
+        total_length, rhythm_mode,                                                      \
+        rhythm_direction, 0,                                                            \
+        ##args                                                                          \
 }
 
 
