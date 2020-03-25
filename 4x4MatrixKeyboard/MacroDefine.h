@@ -6,17 +6,21 @@
 #define H_4X4MATRIXKEYBOARD_MACRODEFINE_H
 
 #ifdef ENABLE_MINIMIZE_MODE
-#   define USE_MAX_VALID_ROW_COL
-#   define USE_SET_PIN
+#   undef USE_MAX_VALID_ROW_COL
+#   undef USE_SET_PIN
+#   undef NEED_CHECK_isInited
 #elif ENABLE_MAXIMIZE_MODE
 #   define USE_MAX_VALID_ROW_COL 1
 #   define USE_SET_PIN 1
+#   define NEED_CHECK_isInited
 #else
 #   ifdef ENABLE_MAX_VALID_ROW_COL
 #      define USE_MAX_VALID_ROW_COL
+#      define NEED_CHECK_isInited 1
 #   endif  // ENABLE_MAX_VALID_ROW_COL
 #   ifdef ENABLE_SET_PIN
 #      define USE_SET_PIN
+#      define NEED_CHECK_isInited
 #   else
 
 #       ifndef SET_PREDEFINE_PIN_ROW_0

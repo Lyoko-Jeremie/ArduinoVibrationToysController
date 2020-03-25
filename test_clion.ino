@@ -12,6 +12,7 @@
 
 Servo servos[MaxServosNum];
 RhythmPlayer *rp;
+MATRIXKEYBOARD4X4 kb4x4;
 
 void key_test(uint8_t edge, uint8_t keynum);
 
@@ -60,7 +61,7 @@ void setup() {
     };
 
     // init Keyboard
-    initPortState();
+    kb4x4.initPortState();
     regKeyCallBack();
 
     // init servos
@@ -103,7 +104,7 @@ float levelOffset[MaxServosNum] = {
 
 void loop() {
 
-    ScanKeyAndCallKeyCallBackFunction();
+    kb4x4.ScanKeyAndCallKeyCallBackFunction();
 
     if (getBoolBit(state, isTotalStart) & !getBoolBit(state, isTotalPause)) {
         for (int i = 0; i < MaxServosNum; ++i) {
@@ -136,7 +137,7 @@ void key_test(uint8_t edge, uint8_t keynum) {
 
 int8_t getServoNum() {
     for (uint8_t i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             return i;
         }
     }
@@ -216,7 +217,7 @@ void key_one_next(uint8_t edge, uint8_t keynum) {
         return;
     }
     for (uint8_t i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             rp[i].forceNextRhythm();
         }
     }
@@ -227,7 +228,7 @@ void key_one_last(uint8_t edge, uint8_t keynum) {
         return;
     }
     for (uint8_t i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             rp[i].forceLastRhythm();
         }
     }
@@ -239,7 +240,7 @@ void key_one_pause(uint8_t edge, uint8_t keynum) {
         return;
     }
     for (uint8_t i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             uint8_t lastState = getBoolBit(state, isServosPauseBase + i);
             setBoolBit(state, isServosPauseBase + i, !lastState);
         }
@@ -251,7 +252,7 @@ void key_one_strength(uint8_t edge, uint8_t keynum) {
         return;
     }
     for (int i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             levelOffset[i] *= levelOffsetAddStep;
             if (levelOffset[i] > maxLevelOffset) {
                 levelOffset[i] = maxLevelOffset;
@@ -265,7 +266,7 @@ void key_one_weak(uint8_t edge, uint8_t keynum) {
         return;
     }
     for (int i = 0; i < MaxServosNum; ++i) {
-        if (GetKeyState(i)) {
+        if (kb4x4.GetKeyState(i)) {
             levelOffset[i] *= levelOffsetSubStep;
             if (levelOffset[i] < mixLevelOffset) {
                 levelOffset[i] = mixLevelOffset;
@@ -284,7 +285,7 @@ void key_reset_levelOffset(uint8_t edge, uint8_t keynum) {
         }
     } else {
         for (int i = 0; i < MaxServosNum; ++i) {
-            if (GetKeyState(i)) {
+            if (kb4x4.GetKeyState(i)) {
                 levelOffset[i] = baseLevelOffset;
             }
         }
@@ -311,17 +312,17 @@ void key_set_direction(uint8_t edge, uint8_t keynum) {}
  *
  */
 void regKeyCallBack() {
-    setCallBackFunction(3, key_one_pause);
-    setCallBackFunction(4, key_one_next);
-    setCallBackFunction(5, key_one_last);
-    setCallBackFunction(6, key_one_strength);
-    setCallBackFunction(7, key_one_weak);
-    setCallBackFunction(8, key_total_strength);
-    setCallBackFunction(9, key_total_weak);
-    setCallBackFunction(10, key_total_next);
-    setCallBackFunction(11, key_total_last);
-    setCallBackFunction(12, key_total_start);
-    setCallBackFunction(13, key_total_stop);
-    setCallBackFunction(14, key_total_pause);
-    setCallBackFunction(15, key_reset_levelOffset);
+    kb4x4.setCallBackFunction(3, key_one_pause);
+    kb4x4.setCallBackFunction(4, key_one_next);
+    kb4x4.setCallBackFunction(5, key_one_last);
+    kb4x4.setCallBackFunction(6, key_one_strength);
+    kb4x4.setCallBackFunction(7, key_one_weak);
+    kb4x4.setCallBackFunction(8, key_total_strength);
+    kb4x4.setCallBackFunction(9, key_total_weak);
+    kb4x4.setCallBackFunction(10, key_total_next);
+    kb4x4.setCallBackFunction(11, key_total_last);
+    kb4x4.setCallBackFunction(12, key_total_start);
+    kb4x4.setCallBackFunction(13, key_total_stop);
+    kb4x4.setCallBackFunction(14, key_total_pause);
+    kb4x4.setCallBackFunction(15, key_reset_levelOffset);
 }

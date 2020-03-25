@@ -2,27 +2,15 @@
 // Created by jeremie on 2020/03/22.
 //
 
+// follow code port from https://github.com/Lyoko-Jeremie/52/blob/master/main.c
+
 #include <Arduino.h>
 
 #include "4x4MatrixKeyboard.h"
 
-// follow code port from https://github.com/Lyoko-Jeremie/52/blob/master/main.c
-
-uint8_t isInited = false;
-
-
 #ifdef USE_SET_PIN
-int row0 = 5;
-int row1 = 4;
-int row2 = 3;
-int row3 = 2;
 
-int col0 = 6;
-int col1 = 7;
-int col2 = 8;
-int col3 = 9;
-
-void SetPin(
+void MATRIXKEYBOARD4X4::SetPin(
         int _row0,
         int _row1,
         int _row2,
@@ -43,33 +31,11 @@ void SetPin(
         col3 = _col3;
     }
 }
-#else   // USE_SET_PIN
-const int row0 = PREDEFINE_PIN_ROW_0;
-const int row1 = PREDEFINE_PIN_ROW_1;
-const int row2 = PREDEFINE_PIN_ROW_2;
-const int row3 = PREDEFINE_PIN_ROW_3;
 
-const int col0 = PREDEFINE_PIN_COL_0;
-const int col1 = PREDEFINE_PIN_COL_1;
-const int col2 = PREDEFINE_PIN_COL_2;
-const int col3 = PREDEFINE_PIN_COL_3;
-
-//const int row0 = 5;
-//const int row1 = 4;
-//const int row2 = 3;
-//const int row3 = 2;
-//
-//const int col0 = 6;
-//const int col1 = 7;
-//const int col2 = 8;
-//const int col3 = 9;
-#endif  // USE_SET_PIN  USE_PREDEFINE_SET_PIN
+#endif // USE_SET_PIN
 
 #ifdef USE_MAX_VALID_ROW_COL
-uint8_t MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
-uint8_t MaxValidCol = D_4X4MATRIXKEYBOARD_MAX_COLS;
-
-void setMaxValidRowCol(uint8_t row, uint8_t col) {
+void MATRIXKEYBOARD4X4::setMaxValidRowCol(uint8_t row, uint8_t col) {
     if (!isInited) {
         if (row > D_4X4MATRIXKEYBOARD_MAX_ROWS) {
             MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
@@ -87,16 +53,15 @@ void setMaxValidRowCol(uint8_t row, uint8_t col) {
         }
     }
 }
-#else   // USE_MAX_VALID_ROW_COL
-const uint8_t MaxValidRow = D_4X4MATRIXKEYBOARD_MAX_ROWS;
-const uint8_t MaxValidCol = D_4X4MATRIXKEYBOARD_MAX_COLS;
-#endif  // USE_MAX_VALID_ROW_COL
+#endif // USE_MAX_VALID_ROW_COL
 
 /**
  * must call before ScanKeyAndCallKeyCallBackFunction()
  */
-void initPortState() {
+void MATRIXKEYBOARD4X4::initPortState() {
+#ifdef NEED_CHECK_isInited
     isInited = true;
+#endif // NEED_CHECK_isInited
     if (MaxValidRow > 0) pinMode(row0, OUTPUT);
     if (MaxValidRow > 1) pinMode(row1, OUTPUT);
     if (MaxValidRow > 2) pinMode(row2, OUTPUT);
@@ -107,17 +72,7 @@ void initPortState() {
     if (MaxValidCol > 3) pinMode(col3, INPUT_PULLUP);
 }
 
-// 0x1 刚检测到一次疑似状态变更（防抖）
-// 0x2 已确认的当前状态
-// 0x4 刚发生了一次确认的状态变更
-uint8_t AKstate[4][4] = {
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}
-};
-
-uint8_t GetColState(uint8_t n) {
+uint8_t MATRIXKEYBOARD4X4::GetColState(uint8_t n) {
     switch (n) {
         case 0:
             return digitalRead(col0);
@@ -132,7 +87,7 @@ uint8_t GetColState(uint8_t n) {
     }
 }
 
-void ArrayKeyScan() {
+void MATRIXKEYBOARD4X4::ArrayKeyScan() {
     for (uint8_t i = 0; i < MaxValidRow; ++i) {
         if (MaxValidRow > 0) digitalWrite(row0, HIGH);
         if (MaxValidRow > 1) digitalWrite(row1, HIGH);
@@ -179,16 +134,12 @@ void ArrayKeyScan() {
 }
 
 
-// 按键回调函数表
-// 前16个为矩阵键盘 0~15
-CallBack_Key *CBKeyList[16] = {nullptr};
-
-void setCallBackFunction(uint8_t i, CallBack_Key func) {
+void MATRIXKEYBOARD4X4::setCallBackFunction(uint8_t i, CallBack_Key func) {
     CBKeyList[i] = func;
 }
 
 // 调用按键回调函数
-void CallKeyCallBackFunction() {
+void MATRIXKEYBOARD4X4::CallKeyCallBackFunction() {
     uint8_t i;
     // 矩阵键盘
     for (i = 0; i != 16; ++i) {
@@ -203,11 +154,11 @@ void CallKeyCallBackFunction() {
 }
 
 
-void ScanKeyAndCallKeyCallBackFunction() {
+void MATRIXKEYBOARD4X4::ScanKeyAndCallKeyCallBackFunction() {
     ArrayKeyScan();
     CallKeyCallBackFunction();
 }
 
-uint8_t GetKeyState(uint8_t i) {
+uint8_t MATRIXKEYBOARD4X4::GetKeyState(uint8_t i) {
     return (AKstate[i / 4][i % 4] & 0x2u) ? 1u : 0u;
 }
