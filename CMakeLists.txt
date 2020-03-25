@@ -24,6 +24,7 @@ add_subdirectory(4x4MatrixKeyboard)
 #set(ENABLE_VibrationRhythmController_DEBUG_OUTPUT ON)
 #add_compile_definitions(VibrationRhythmController_DEBUG_OUTPUT=1)
 add_subdirectory(VibrationRhythmController)
+add_subdirectory(BoolBitStorage)
 
 ### Additional settings to add non-standard or your own Arduino libraries.
 # For this example (libs will contain additional arduino libraries)
