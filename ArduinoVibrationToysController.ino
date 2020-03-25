@@ -276,7 +276,7 @@ void key_one_weak(uint8_t edge, uint8_t keynum) {
 }
 
 void key_reset_levelOffset(uint8_t edge, uint8_t keynum) {
-    uint8_t n = getServoNum();
+    int8_t n = getServoNum();
     if (n == -1) {
         // if any Servo be selected
         // reset all
@@ -305,7 +305,7 @@ void key_set_direction(uint8_t edge, uint8_t keynum) {}
  *    |0       |1      |2      |3
  * ---|--------|-------|-------|-------
  * 0  |1       |2      |3      |o_pause
- * 4  |o_next  |o_last |o_st   |o_wk
+ * 4  |o_st    |o_wk   |o_next |o_last
  * 8  |t_str   |t_weak |t_next |t_last
  * 12 |t_start |t_stop |t_pause|reset_levelOffset
  * ************************************
@@ -313,10 +313,10 @@ void key_set_direction(uint8_t edge, uint8_t keynum) {}
  */
 void regKeyCallBack() {
     kb4x4.setCallBackFunction(3, key_one_pause);
-    kb4x4.setCallBackFunction(4, key_one_next);
-    kb4x4.setCallBackFunction(5, key_one_last);
-    kb4x4.setCallBackFunction(6, key_one_strength);
-    kb4x4.setCallBackFunction(7, key_one_weak);
+    kb4x4.setCallBackFunction(4, key_one_strength);
+    kb4x4.setCallBackFunction(5, key_one_weak);
+    kb4x4.setCallBackFunction(6, key_one_next);
+    kb4x4.setCallBackFunction(7, key_one_last);
     kb4x4.setCallBackFunction(8, key_total_strength);
     kb4x4.setCallBackFunction(9, key_total_weak);
     kb4x4.setCallBackFunction(10, key_total_next);
