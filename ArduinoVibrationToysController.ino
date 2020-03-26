@@ -278,7 +278,7 @@ void key_one_weak(uint8_t edge, uint8_t keynum) {
 void key_reset_levelOffset(uint8_t edge, uint8_t keynum) {
     int8_t n = getServoNum();
     if (n == -1) {
-        // if any Servo be selected
+        // if any Servo not be selected
         // reset all
         for (int i = 0; i < MaxServosNum; ++i) {
             levelOffset[i] = baseLevelOffset;
